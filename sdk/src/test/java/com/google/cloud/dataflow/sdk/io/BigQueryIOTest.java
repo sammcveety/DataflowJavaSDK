@@ -1748,6 +1748,7 @@ public class BigQueryIOTest implements Serializable {
   public void testCreateNeverWithStreaming() throws Exception {
     BigQueryOptions options = TestPipeline.testingPipelineOptions().as(BigQueryOptions.class);
     options.setProject("project");
+    options.setStreaming(true);
     Pipeline p = TestPipeline.create(options);
 
     TableReference tableRef = new TableReference();
