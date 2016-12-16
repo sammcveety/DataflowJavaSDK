@@ -2961,15 +2961,15 @@ public class BigQueryIO {
   * it leverages BigQuery best effort de-dup mechanism.
    */
   private static class StreamWithDeDup extends PTransform<PCollection<TableRow>, PDone> {
-    private final transient ValueProvider<TableReference> tableReference;
-    private final SerializableFunction<BoundedWindow, TableReference> tableRefFunction;
-    private final transient ValueProvider<TableSchema> tableSchema;
+    @Nullable private final transient ValueProvider<TableReference> tableReference;
+    @Nullable private final SerializableFunction<BoundedWindow, TableReference> tableRefFunction;
+    @Nullable private final transient ValueProvider<TableSchema> tableSchema;
     private final Write.CreateDisposition createDisposition;
 
     /** Constructor. */
     StreamWithDeDup(ValueProvider<TableReference> tableReference,
-        SerializableFunction<BoundedWindow, TableReference> tableRefFunction,
-        ValueProvider<TableSchema> tableSchema,
+        @Nullable SerializableFunction<BoundedWindow, TableReference> tableRefFunction,
+        @Nullable ValueProvider<TableSchema> tableSchema,
         Write.CreateDisposition createDisposition) {
       this.tableReference = tableReference;
       this.tableRefFunction = tableRefFunction;

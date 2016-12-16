@@ -84,8 +84,10 @@ import com.google.cloud.dataflow.sdk.testing.TestPipeline;
 import com.google.cloud.dataflow.sdk.transforms.Create;
 import com.google.cloud.dataflow.sdk.transforms.DoFn;
 import com.google.cloud.dataflow.sdk.transforms.DoFnTester;
+import com.google.cloud.dataflow.sdk.transforms.MapElements;
 import com.google.cloud.dataflow.sdk.transforms.ParDo;
 import com.google.cloud.dataflow.sdk.transforms.SerializableFunction;
+import com.google.cloud.dataflow.sdk.transforms.SimpleFunction;
 import com.google.cloud.dataflow.sdk.transforms.display.DataflowDisplayDataEvaluator;
 import com.google.cloud.dataflow.sdk.transforms.display.DisplayData;
 import com.google.cloud.dataflow.sdk.transforms.display.DisplayDataEvaluator;
@@ -1732,6 +1734,33 @@ public class BigQueryIOTest implements Serializable {
                 new BigQueryIO.TableSpecToTableRef()), null);
     TableReference table = BigQueryIO.parseTableSpec(tag.getTableSpec().get());
     assertNotNull(table.getProjectId());
+  }
+
+  @Test
+  public void testCreateNeverWithStreaming() throws Exception {
+    BigQueryOptions options = TestPipeline.testingPipelineOptions().as(BigQueryOptions.class);
+    options.setProject("project");
+    Pipeline p = TestPipeline.create(options);
+
+    TableReference tableRef = new TableReference();
+    tableRef.setDatasetId("dataset");
+    tableRef.setTableId("sometable");
+
+    PCollection<TableRow> tableRows =
+        p.apply(CountingInput.unbounded())
+        .apply(
+            MapElements.via(
+                new SimpleFunction<Long, TableRow>() {
+                  @Override
+                  public TableRow apply(Long input) {
+                    return null;
+                  }
+                }))
+        .setCoder(TableRowJsonCoder.of());
+    tableRows
+        .apply(BigQueryIO.Write.to(tableRef)
+            .withCreateDisposition(CreateDisposition.CREATE_NEVER)
+            .withoutValidation());
   }
 
   private static void testNumFiles(File tempDir, int expectedNumFiles) {
