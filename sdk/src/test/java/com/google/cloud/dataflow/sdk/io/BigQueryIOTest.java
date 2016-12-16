@@ -1737,6 +1737,14 @@ public class BigQueryIOTest implements Serializable {
   }
 
   @Test
+  public void testStreamingWriteFnCreateNever() throws Exception {
+    BigQueryIO.StreamingWriteFn fn = new BigQueryIO.StreamingWriteFn(
+        null, CreateDisposition.CREATE_NEVER);
+    assertEquals(BigQueryIO.parseTableSpec("dataset.table"),
+        fn.getOrCreateTable(null, "dataset.table"));
+  }
+
+  @Test
   public void testCreateNeverWithStreaming() throws Exception {
     BigQueryOptions options = TestPipeline.testingPipelineOptions().as(BigQueryOptions.class);
     options.setProject("project");

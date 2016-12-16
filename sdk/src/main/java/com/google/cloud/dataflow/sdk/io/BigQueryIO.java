@@ -2638,7 +2638,8 @@ public class BigQueryIO {
    * Implementation of DoFn to perform streaming BigQuery write.
    */
   @SystemDoFnInternal
-  private static class StreamingWriteFn
+  @VisibleForTesting
+  static class StreamingWriteFn
       extends DoFn<KV<ShardedKey<String>, TableRowInfo>, Void> {
     /** TableSchema in JSON. Use String to make the class Serializable. */
     @Nullable private final ValueProvider<String> jsonTableSchema;
